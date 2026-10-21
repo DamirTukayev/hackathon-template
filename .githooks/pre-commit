@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Быстрая проверка только застейдженных файлов (~секунды).
+# Обойти в крайнем случае: git commit --no-verify (CI всё равно проверит).
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+fail() { echo "✗ pre-commit: $1" >&2; exit 1; }
+
+staged=()
+while IFS= read -r -d '' f; do staged+=("$f"); done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+[ ${#staged[@]} -eq 0 ] && exit 0
+
+# 1. Секреты: .env и ключи в диффе
+for f in "${staged[@]}"; do
+  case "$f" in
+    *.example) ;;
+    .env | */.env | .env.* | */.env.*) fail "$f — файл с секретами нельзя коммитить" ;;
+  esac
+done
+if git diff --cached -U0 -- . ':!*package-lock.json' | grep '^+' \
+  | grep -Eq '(^|[^A-Za-z0-9])(sk-ant-[A-Za-z0-9_-]{10,}|sk-[A-Za-z0-9]{32,}|AKIA[0-9A-Z]{16})'; then
+  fail "в диффе похоже на API-ключ. Уберите его (если уже пушили — отзовите ключ)"
+fi
+
+# 2. Python: ruff (автоисправление + форматирование)
+py=()
+for f in "${staged[@]}"; do [[ $f == apps/api/*.py ]] && py+=("${f#apps/api/}"); done
+if [ ${#py[@]} -gt 0 ]; then
+  ruff="$PWD/apps/api/.venv/bin/ruff"
+  [ -x "$ruff" ] || ruff=$(command -v ruff || true)
+  if [ -n "$ruff" ]; then
+    (cd apps/api && "$ruff" check --fix -q "${py[@]}") || fail "ruff нашёл ошибки (см. выше)"
+    (cd apps/api && "$ruff" format -q "${py[@]}")
+    git add -- "${py[@]/#/apps/api/}"
+  else
+    echo "⚠ ruff не найден — пропускаю Python (make install)" >&2
+  fi
+fi
+
+# 3. Web: prettier + typecheck
+web=()
+ts=0
+for f in "${staged[@]}"; do
+  case "$f" in
+    apps/web/package-lock.json) ;;
+    apps/web/*.ts | apps/web/*.tsx | apps/web/*.css | apps/web/*.json | apps/web/*.html | apps/web/*.md)
+      web+=("${f#apps/web/}")
+      [[ $f == *.ts || $f == *.tsx ]] && ts=1
+      ;;
+  esac
+done
+if [ ${#web[@]} -gt 0 ]; then
+  if [ -d apps/web/node_modules ]; then
+    (cd apps/web && npx --no-install prettier --write --log-level warn "${web[@]}")
+    git add -- "${web[@]/#/apps/web/}"
+    if [ $ts -eq 1 ]; then
+      (cd apps/web && npm run -s typecheck) || fail "TypeScript: ошибки типов (см. выше)"
+    fi
+  else
+    echo "⚠ apps/web/node_modules нет — пропускаю web (make install)" >&2
+  fi
+fi
