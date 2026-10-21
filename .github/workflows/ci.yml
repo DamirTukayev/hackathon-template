@@ -16,6 +16,7 @@ jobs:
       - run: ruff check . && ruff format --check .
       - name: Import smoke test
         run: python -c "from app.main import app"
+      - run: pytest -q
 
   web:
     runs-on: ubuntu-latest

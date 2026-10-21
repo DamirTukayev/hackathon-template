@@ -1,4 +1,4 @@
-.PHONY: install hooks api web dev demo fmt check
+.PHONY: install hooks api web dev demo fmt test check
 
 install:
 	python3 -m venv apps/api/.venv
@@ -29,7 +29,11 @@ fmt:
 	cd apps/api && .venv/bin/ruff check --fix . && .venv/bin/ruff format .
 	cd apps/web && npm run fmt
 
+# Тесты API (офлайн, на mock-провайдере — ключи не нужны).
+test:
+	cd apps/api && .venv/bin/pytest -q
+
 # То же, что гоняет CI. Должно быть зелёным перед пушем.
 check:
-	cd apps/api && .venv/bin/ruff check . && .venv/bin/ruff format --check .
+	cd apps/api && .venv/bin/ruff check . && .venv/bin/ruff format --check . && .venv/bin/pytest -q
 	cd apps/web && npm run fmt:check && npm run build
