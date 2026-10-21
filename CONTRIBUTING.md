@@ -8,9 +8,10 @@
 
 | Роль | Кто | Зона |
 |---|---|---|
-| AI / Backend | _имя_ | `apps/api/` |
-| Frontend | _имя_ | `apps/web/` |
-| Продукт / питч | _имя_ | `docs/`, `demo_cache.json`, `knowledge/`, слайды, видео |
+| AI / ML | Владимир | `apps/api/app/ai/`, `apps/api/app/data/knowledge/` |
+| Backend / интеграции | Нуржан | `apps/api/app/api/`, `apps/api/app/schemas/`, `apps/api/app/core/` |
+| Frontend | Дамир | `apps/web/` |
+| Продукт / питч / QA | Фархат | `docs/`, `demo_cache.json`, слайды, видео |
 
 Общие файлы (правим аккуратно, предупреждаем в чате): `.env.example`, `Makefile`, `package.json`, `requirements.txt`, `docs/`.
 
