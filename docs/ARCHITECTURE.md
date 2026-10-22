@@ -21,6 +21,9 @@
 │           ├── pages/          # страницы = композиция features
 │           ├── features/chat/  # ui/, model/ (Jotai + хуки), api/ (SSE-клиент), types.ts
 │           └── shared/         # ui-кит (Base UI), lib, api-клиент
+├── specs/                      # спеки: 000-product, NNN-<фича> (источник правды, см. specs/README.md)
+├── scripts/                    # spec_lint.py, sync-hints.sh
+├── .claude/commands/           # /spec, /spec-check для Claude Code
 ├── docs/
 ├── .env.example
 └── Makefile

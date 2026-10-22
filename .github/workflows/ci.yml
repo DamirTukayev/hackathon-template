@@ -28,3 +28,9 @@ jobs:
       - run: npm ci
       - run: npm run fmt:check
       - run: npm run build
+
+  specs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/spec_lint.py
