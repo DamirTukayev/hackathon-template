@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# После git pull / merge: подсказать, что переустановить.
+cd "$(git rev-parse --show-toplevel)"
+scripts/sync-hints.sh ORIG_HEAD HEAD || true
