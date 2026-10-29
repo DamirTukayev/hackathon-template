@@ -9,6 +9,6 @@ make -j2 dev          # API :8000 + Web :5173
 DEMO_MODE=true make -j2 dev   # офлайн, только заготовленные ответы
 ```
 
-Командная работа: [CONTRIBUTING.md](CONTRIBUTING.md) · перед пушем `make fmt && make check`
+Работаем по спекам: [specs/README.md](specs/README.md) · командная работа: [CONTRIBUTING.md](CONTRIBUTING.md) · перед пушем `make fmt && make check`
 
 Документы: [Архитектура](docs/ARCHITECTURE.md) · [Roadmap на 48 часов](docs/ROADMAP.md) · [Риски и страховки](docs/RISKS.md)

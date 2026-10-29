@@ -1,4 +1,4 @@
-.PHONY: install hooks sync api web dev demo fmt test check
+.PHONY: install hooks sync api web dev demo fmt test specs check
 
 install:
 	python3 -m venv apps/api/.venv
@@ -43,7 +43,12 @@ fmt:
 test:
 	cd apps/api && .venv/bin/pytest -q
 
+# Форма спек в specs/ (метаданные, разделы, TODO, AC). Правила: specs/README.md
+specs:
+	python3 scripts/spec_lint.py
+
 # То же, что гоняет CI. Должно быть зелёным перед пушем.
 check:
 	cd apps/api && .venv/bin/ruff check . && .venv/bin/ruff format --check . && .venv/bin/pytest -q
 	cd apps/web && npm run fmt:check && npm run build
+	python3 scripts/spec_lint.py
