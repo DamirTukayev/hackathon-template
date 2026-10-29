@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Не блокирует, только предупреждает: main ушёл вперёд — лучше синхронизироваться до PR.
+git fetch -q origin main 2>/dev/null || exit 0   # нет сети — не мешаем
+behind=$(git rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
+if [ "$behind" -gt 0 ]; then
+  echo "⚠ origin/main ушёл вперёд на $behind коммит(ов). Сделайте make sync, чтобы не ловить конфликты в PR." >&2
+fi
+exit 0
